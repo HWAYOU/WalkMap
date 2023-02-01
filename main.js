@@ -1,11 +1,10 @@
 const searchBox = document.querySelector(".searchBox");
 const inputBox = document.querySelector(".inputBox");
-const form = document.querySelector("form");
+const searchBoxForm = document.querySelector(".searchBoxForm");
 const searchBtn = document.querySelector(".searchBtn");
-const infoBox = document.querySelector("#infoBox");
+const infoBox = document.querySelector(".infoBox");
 
-//좌표 변환 세팅
-//2097 : 변환 전 좌표계 / 4326 : 변환 후 좌표계
+//좌표 변환 세팅 (2097 : 변환 전 좌표계 / 4326 : 변환 후 좌표계)
 Proj4js.defs["EPSG:2097"] =
   "+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=bessel +units=m +no_defs +towgs84=-115.80,474.99,674.11,1.16,-2.31,-1.63,6.43";
 Proj4js.defs["EPSG:4326"] = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
@@ -15,11 +14,11 @@ var t_srs = new Proj4js.Proj("EPSG:4326");
 //산책로 모든 정보를 저장하는 배열
 let allWalkList = [];
 
-//allWalkList에서 courseName 중복 항목 제거된(코스 당 좌표 하나만 표시된다) 배열
+//allWalkList에서 courseName 중복 항목 제거된 배열(코스 당 좌표 하나만 표시된다)
 let walkList;
 
 //산책로 위치정보만 저장하는 positions 배열
-var positions = [];
+let positions = [];
 
 //산책로 데이터 연결
 fetch(
@@ -29,7 +28,6 @@ fetch(
   .then((xml) => {
     //xml형태의 문자열을 DOM으로 변환하여 data에 저장
     let data = new DOMParser().parseFromString(xml, "text/xml");
-    console.log(data);
     //산책로 정보가 들어있는 <row>를 모두 찾아 변수 rows에 저장
     const rows = data.querySelectorAll("row");
 
@@ -69,7 +67,7 @@ fetch(
       allWalkList.push(walkInfo);
     });
 
-    //walkList : courseName 중복 항목 제거된(코스 당 좌표 하나만 표시된다) 배열
+    //courseName 중복 제거
     walkList = allWalkList.reduce(function (acc, current) {
       if (
         acc.findIndex(({ courseName }) => courseName === current.courseName) ===
@@ -80,11 +78,6 @@ fetch(
       return acc;
     }, []);
 
-    //walkList 배열 안의 coursName과 input이 같은지 검증하는 함수
-    //(입력한 input 값으로 데이터 출력)
-    checkInput(walkList);
-
-    // console.log(walkList);
     //walkList에 저장된 정보들을 position 배열에 추가한다.
     walkList.forEach((info) => {
       //1. 좌표변환(TM -> WGS84)
@@ -95,9 +88,9 @@ fetch(
 
       var result = Proj4js.transform(s_srs, t_srs, pt); //좌표계 변경
 
-      // console.log(result); //경도, 위도
-      var lat = result.y; //위도 경도  순서가 바뀌어서 출력된다.
-      var lng = result.x; //위도 경도  순서가 바뀌어서 출력된다.
+      //위도 경도 순서가 바뀌어서 출력된다.
+      var lat = result.y;
+      var lng = result.x;
 
       //2. 변환된 좌표를 position에 추가
       positions.push({
@@ -108,6 +101,9 @@ fetch(
 
     //지도 출력 함수 호출
     showMap(positions);
+
+    //walkList 배열 안의 coursName과 input 값이 같은지 검증하는 함수
+    checkInput(walkList);
   });
 
 //지도 출력 및 마크 생성, 클릭 이벤트 함수
@@ -135,13 +131,13 @@ function showMap(positions) {
       map: map, // 마커를 표시할 지도
       position: positions[i].latlng, // 마커의 위치
       image: markerImage, // 마커 이미지
-      // title: positions[i].content,
     });
 
     //인포윈도우 : 마커 마우스오버 시 나타나는 창
+    // 인포윈도우에 표시할 내용 : content(=courseName)
     var infowindow = new kakao.maps.InfoWindow({
       content: positions[i].content,
-    }); // 인포윈도우에 표시할 내용(content = courseName)
+    });
 
     // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
     // 이벤트 리스너로는 클로저를 만들어 등록합니다
@@ -157,45 +153,42 @@ function showMap(positions) {
       "mouseout",
       makeOutListener(infowindow)
     );
-
-    // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
-    function makeOverListener(map, marker, infowindow) {
-      return function () {
-        infowindow.open(map, marker);
-      };
-    }
-    ////
-    // 인포윈도우를 닫는 클로저를 만드는 함수입니다
-    function makeOutListener(infowindow) {
-      return function () {
-        infowindow.close();
-      };
-    }
   }
 }
 
+// 인포윈도우를 표시하는 클로저를 만드는 함수
+function makeOverListener(map, marker, infowindow) {
+  return function () {
+    infowindow.open(map, marker);
+  };
+}
+// 인포윈도우를 닫는 클로저를 만드는 함수
+function makeOutListener(infowindow) {
+  return function () {
+    infowindow.close();
+  };
+}
+
 //입력한 input 값과 courseName을 비교하여 데이터 출력하는 함수
-function checkInput(obj) {
+function checkInput() {
   infoBox.innerHTML = "";
 
-  //form 이벤트 설정
-  form.addEventListener("submit", (event) => {
-    // 1. submit 이벤트로 인해서 발생하는 페이지 새로고침 방지
-    // (button을 누르면 무조건 submit발생)
+  //searchBoxForm 이벤트 설정
+  searchBoxForm.addEventListener("submit", (event) => {
+    // 1.submit 이벤트로 인해 발생하는 페이지 새로고침 방지(button을 누르면 무조건 submit 발생)
     event.preventDefault();
     infoBox.innerHTML = "";
-
-    // (inputBox에서 받는 값을 변수로 정의)
+    // inputBox에서 받는 값을 변수로 정의
     let userInput = inputBox.value;
-    console.log("입력된값: " + userInput);
+
     // 2. obj(=walkList)를 반복문을 돌린다
     // userInput과 같은 courseName이 있다면 infoBox에 결과값을 출력해라
     walkList.forEach((item) => {
       var itemCourseName = item.courseName;
-      //변수로 지정해줘야 타입에러가 나지 않는다
+      // 변수로 지정해줘야 타입에러가 나지 않는다
       if (itemCourseName.includes(userInput) === true) {
         infoBox.innerHTML += `<div class="infoBoxItem">
-        <p class="courseName">${item.courseName}</p>
+        <h1 class="courseName">${item.courseName}</h1>
         <table>
         <tr>
         <td>위치<br>${item.areaGu}</td>
@@ -209,7 +202,6 @@ function checkInput(obj) {
         <p class="detailCourse">${item.detailCourse}</p>
         <p class="relateSubway">🚃 ${item.relateSubway}</p>
         <p class="trafficInfo">${item.trafficInfo}</p>
-
         <form action="https://search.naver.com/search.naver" method="get" >
           <input type="text" name="query" value=${itemCourseName} style="display: none;"></input>
           <button class="naverBtn">NAVER 검색 결과</button>

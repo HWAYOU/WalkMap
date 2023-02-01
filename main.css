@@ -24,85 +24,59 @@
 
 body {
     background-color: rgb(250, 242, 226);
-    margin: 0;
-}
-
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* 화면 중앙 정렬 */
-
-    flex-wrap: wrap;
-    text-align: center;
+    margin: 30px 20px;
 }
 
 .logo {
     font-family: 'KOTRAHOPE';
+    font-weight: 500;
     color: #01772e;
     text-align: center;
-    padding-top: 20px;
-    font-size: 6vh;
+    font-size: 40px;
     margin: 0;
 }
 
-#ex {
+.desc {
     font-family: 'GangwonEdu_OTFBoldA';
     text-align: center;
-    font-size: 20px;
-    margin-bottom: 30px;
+    font-size: 18px;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    /* 화면이 줄어들면 넘치는 요소가 다음줄로 내려간다 */
 }
 
 .searchBox {
     height: 500px;
     width: 430px;
     margin: 15px 30px;
-    font-size: 17px;
+    font-size: 16px;
     font-family: 'GangwonEdu_OTFBoldA';
+    word-break: keep-all;
+    /* 줄바꿈 단어 단위로 */
 }
 
 .searchBoxForm {
     padding: 0;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 .inputBox {
     padding: 10px 20px;
-    border-radius: 24px;
+    border-radius: 25px;
     border: none;
     width: 230px;
-    /* font-family: 'GangwonEdu_OTFBoldA'; */            
-}
-#infoBox {
-    margin: 0px 10px;
-    padding: 0px 10px;
-    text-align: center;
-    /* overflow: auto; */
-    /* height: 450px; */
-
 }
 
-.infoBoxItem {
-    /* border: 1px solid black; */
-    padding: 30px;
-        border-radius: 30px;
-    background-color: white;
-    box-shadow: 0px 0px 5px rgb(137, 137, 137);;
-}
-table {
-    margin: 0 auto;
+.inputBox:focus {
+    outline: none;
 }
 
-.searchBtn{
-    border-radius: 24px;
-    width: 80px;
-    cursor: pointer;
-}
-.naverBtn {
-    border-radius: 3px;   
-    width: 300px;
-    cursor: pointer;
-}
 .searchBtn, .naverBtn {
     font-family: 'LINESeedKR-Bd';
     background-color: #4CAF50;
@@ -110,10 +84,41 @@ table {
     color: white;
     padding: 7px 15px;
     font-size: 15px;
-    margin: 7px;
 }
-.searchBtn:hover {
-    box-shadow: 0px 0px 5px rgb(137, 137, 137);
+
+.searchBtn{
+    border-radius: 24px;
+    width: 80px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.infoBox {
+    margin: 0px 10px;
+    padding: 0px 10px;
+    text-align: center;
+}
+
+.infoBoxItem {
+    padding: 30px;
+    border-radius: 30px;
+    background-color: white;
+    box-shadow: 0px 0px 6px rgb(186, 186, 186);;
+}
+
+table {
+    margin: 0 auto;
+}
+
+td {
+    width: 100px;
+}
+
+.naverBtn {
+    border-radius: 3px;   
+    width: 300px;
+    cursor: pointer;
+    margin: 7px;
 }
 
 .naverBtn:hover {
@@ -125,12 +130,8 @@ table {
 .courseName {
     font-size: 30px;
     margin: 20px 0px 30px 0px;
-
 }
 
-td {
-    width: 100px;
-}
 .courseLevel {
     display: none;
 }
